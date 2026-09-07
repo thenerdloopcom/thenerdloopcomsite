@@ -30,7 +30,7 @@ export default async function WaitlistPage() {
 
       <div className="relative z-10 flex w-full max-w-xl flex-col items-center">
         {/* Brand logo — presented on its native black comic panel */}
-        <div className="tnl-slam w-full max-w-md border-4 border-tnl-black bg-tnl-black shadow-[10px_10px_0_0_var(--tnl-black)]">
+        <div className="tnl-slam w-full max-w-2xl">
           <Image
             src="/tnl-logo.png"
             alt="TheNerdLoop"

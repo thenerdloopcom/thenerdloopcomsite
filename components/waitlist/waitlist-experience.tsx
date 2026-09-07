@@ -60,8 +60,8 @@ export function WaitlistExperience({ initialCount }: { initialCount: number }) {
     try {
       const supabase = createClient()
       const { data, error } = await supabase.rpc("join_waitlist", {
-        name: trimmedName,
-        email: normalizedEmail,
+        p_name: trimmedName,
+        p_email: normalizedEmail,
       })
 
       if (error) {

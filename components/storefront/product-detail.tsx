@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Check, ChevronLeft, ChevronRight, ArrowUpRight, Plus, Minus } from 'lucide-react'
 import { type Product, formatPrice } from '@/data/catalog'
+import { useCart } from './cart-provider'
 
 const colorClass: Record<string, string> = { 
   red: 'product-red', 
@@ -25,13 +26,16 @@ export function ProductDetail({ product }: { product: Product }) {
   const [selected, setSelected] = useState(0)
   const [quantity, setQuantity] = useState(1)
   const [cartAdded, setCartAdded] = useState(false)
+  const { addItem } = useCart()
 
   const addToBag = () => {
+    addItem(product, quantity)
+
     setCartAdded(true)
-    window.dispatchEvent(new CustomEvent('tnl:add-to-bag', { 
-      detail: { product, quantity } 
-    }))
-    setTimeout(() => setCartAdded(false), 2000)
+
+    setTimeout(() => {
+      setCartAdded(false)
+    }, 2000)
   }
 
   return (

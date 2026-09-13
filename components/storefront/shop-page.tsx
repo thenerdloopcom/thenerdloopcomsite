@@ -29,7 +29,7 @@ function ProductCard({ product }: { product: Product }) {
         className="card-image"
       >
         <div
-          className={`product-art product-${product.color}`}
+          className={`product-art`}
         >
           <img
             src={product.image}
@@ -37,20 +37,32 @@ function ProductCard({ product }: { product: Product }) {
           />
 
           {product.badge && (
-            <span className="badge">{product.badge}</span>
+            <span className="badge">
+              {product.badge}
+            </span>
           )}
 
           <button
+            type="button"
             className={`like ${liked ? 'liked' : ''}`}
             onClick={(event) => {
               event.preventDefault()
+              event.stopPropagation()
               toggle(product.slug)
             }}
-            aria-label="Add to wishlist"
+            aria-label={
+              liked
+                ? `Remove ${product.name} from wishlist`
+                : `Add ${product.name} to wishlist`
+            }
           >
             <Heart
               size={18}
-              fill={liked ? 'currentColor' : 'none'}
+              fill={
+                liked
+                  ? 'currentColor'
+                  : 'none'
+              }
             />
           </button>
         </div>

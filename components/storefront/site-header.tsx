@@ -54,7 +54,13 @@ export function SiteHeader() {
           {categories.map((category) => (
             <Link
               key={category.slug}
-              href={`/shop?category=${encodeURIComponent(category.name)}`}
+              href={
+                category.slug === 'access-cards'
+                  ? '/access-cards'
+                  : `/shop?category=${encodeURIComponent(
+                      category.name,
+                    )}`
+              }
               onClick={closeMenu}
             >
               {category.name.toUpperCase()}

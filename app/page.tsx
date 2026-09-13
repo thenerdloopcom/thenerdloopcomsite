@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation"
+import { Storefront } from '@/components/storefront/storefront'
 
 export default function Page() {
-  redirect("/waitlist")
+  return <Storefront />
 }

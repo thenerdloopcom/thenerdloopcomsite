@@ -140,4 +140,4 @@ export const getProduct = (slug: string) => products.find((product) => product.s
 export const getFeatured = () => products.filter(p => p.featured)
 export const getRelated = (slug: string) => products.filter((product) => product.slug !== slug).slice(0, 3)
 
-export const logoImage = '/placeholder-logo.png'
+export const logoImage = '/TNL-Logo-NoBG.png'

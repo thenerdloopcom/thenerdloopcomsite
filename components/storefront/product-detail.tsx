@@ -41,13 +41,8 @@ function ProductArt({
   return (
     <div
       className={`product-art ${
-        colorClass[product.color] ||
-        'product-black'
-      } ${
-        large
-          ? 'product-art-large'
-          : ''
-      }`}
+        colorClass[product.color] || 'product-black'
+      } ${large ? 'product-art-large' : ''}`}
     >
       <img
         src={image || product.image}
@@ -56,10 +51,6 @@ function ProductArt({
 
       <span className="art-label">
         TNL / {product.name}
-      </span>
-
-      <span className="art-burst">
-        OOF!
       </span>
     </div>
   )
@@ -70,22 +61,22 @@ export function ProductDetail({
 }: {
   product: Product
 }) {
-  const [selected, setSelected] =
-    useState(0)
+  const [selected, setSelected] = useState(0)
 
-  const [quantity, setQuantity] =
-    useState(1)
+  const [quantity, setQuantity] = useState(1)
 
-  const [cartAdded, setCartAdded] =
-    useState(false)
+  const [cartAdded, setCartAdded] = useState(false)
+
+  const [purchaseMode, setPurchaseMode] =
+    useState<'as-is' | 'personalized'>('as-is')
 
   const { addItem } = useCart()
 
-  const isPhotoPersonalized =
-    product.cardType ===
-    'photo-personalized'
+  const canPersonalize =
+    product.cardType === 'photo-personalized'
 
-  const isAccessCard = product.productType === 'access-card'
+  const isAccessCard =
+    product.productType === 'access-card'
 
   const addToBag = () => {
     addItem(product, quantity)
@@ -174,7 +165,7 @@ export function ProductDetail({
       <div className="product-detail">
         <p className="eyebrow">
           {product.category} /{' '}
-          {isPhotoPersonalized
+          {canPersonalize
             ? 'PHOTO PERSONALIZED'
             : isAccessCard
               ? 'ACCESS CARD'
@@ -195,7 +186,7 @@ export function ProductDetail({
           {product.description}
         </p>
 
-                <ul>
+        <ul>
           {product.details.map(
             (detail) => (
               <li key={detail}>
@@ -206,63 +197,140 @@ export function ProductDetail({
           )}
         </ul>
 
-        {isPhotoPersonalized ? (
+        {canPersonalize && (
+          <div className="card-purchase-options">
+            <p className="eyebrow">
+              CHOOSE YOUR CARD
+            </p>
+
+            <button
+              type="button"
+              className={`card-purchase-option ${
+                purchaseMode === 'as-is'
+                  ? 'selected'
+                  : ''
+              }`}
+              onClick={() =>
+                setPurchaseMode('as-is')
+              }
+            >
+              <span>
+                <strong>BUY AS-IS</strong>
+
+                <small>
+                  Get the card exactly as shown.
+                </small>
+              </span>
+
+              <span className="purchase-option-indicator">
+                {purchaseMode === 'as-is'
+                  ? '●'
+                  : '○'}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              className={`card-purchase-option ${
+                purchaseMode ===
+                'personalized'
+                  ? 'selected'
+                  : ''
+              }`}
+              onClick={() =>
+                setPurchaseMode(
+                  'personalized',
+                )
+              }
+            >
+              <span>
+                <strong>
+                  PERSONALIZE
+                </strong>
+
+                <small>
+                  Add your own photo to
+                  the card.
+                </small>
+              </span>
+
+              <span className="purchase-option-indicator">
+                {purchaseMode ===
+                'personalized'
+                  ? '●'
+                  : '○'}
+              </span>
+            </button>
+          </div>
+        )}
+
+        <div className="mb-8 flex items-center gap-4">
+          <span className="eyebrow">
+            QUANTITY
+          </span>
+
+          <div className="flex items-center border-2 border-black">
+            <button
+              type="button"
+              className="p-2"
+              aria-label="Decrease quantity"
+              onClick={() =>
+                setQuantity(
+                  Math.max(
+                    1,
+                    quantity - 1,
+                  ),
+                )
+              }
+            >
+              <Minus size={16} />
+            </button>
+
+            <span className="min-w-10 text-center font-bold">
+              {quantity}
+            </span>
+
+            <button
+              type="button"
+              className="p-2"
+              aria-label="Increase quantity"
+              onClick={() =>
+                setQuantity(
+                  quantity + 1,
+                )
+              }
+            >
+              <Plus size={16} />
+            </button>
+          </div>
+        </div>
+
+        {canPersonalize &&
+        purchaseMode ===
+          'personalized' ? (
           <Link
             href={`/products/${product.slug}/personalize`}
             className="checkout-button w-full"
           >
             PERSONALIZE CARD
-            <ArrowUpRight size={18} />
+            <ArrowUpRight
+              size={18}
+            />
           </Link>
         ) : (
-          <>
-            <div className="mb-8 flex items-center gap-4">
-              <span className="font-mono text-xs font-bold">
-                QUANTITY
-              </span>
+          <button
+            type="button"
+            className="checkout-button w-full"
+            onClick={addToBag}
+          >
+            {cartAdded
+              ? 'ADDED TO BAG!'
+              : 'ADD TO BAG'}
 
-              <div className="flex items-center border-2 border-black">
-                <button
-                  type="button"
-                  onClick={() =>
-                    setQuantity((current) =>
-                      Math.max(1, current - 1),
-                    )
-                  }
-                  className="p-2 hover:bg-yellow-400 border-r-2 border-black"
-                  aria-label="Decrease quantity"
-                >
-                  <Minus size={16} />
-                </button>
-
-                <span className="px-4 font-mono font-bold">
-                  {quantity}
-                </span>
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    setQuantity((current) => current + 1)
-                  }
-                  className="p-2 hover:bg-yellow-400 border-l-2 border-black"
-                  aria-label="Increase quantity"
-                >
-                  <Plus size={16} />
-                </button>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              className="checkout-button w-full"
-              onClick={addToBag}
-            >
-              {cartAdded
-                ? 'ADDED TO BAG!'
-                : 'ADD TO BAG'}
-              <ArrowUpRight size={18} />
-            </button>
-          </>
+            <ArrowUpRight
+              size={18}
+            />
+          </button>
         )}
       </div>
     </>

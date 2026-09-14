@@ -1,8 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
-import Link from 'next/link'
-import { ArrowUpRight, ChevronLeft, ChevronRight, Heart } from 'lucide-react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useSearchParams, useRouter } from 'next/navigation'
 
 import {
@@ -10,89 +9,10 @@ import {
   type Category,
   type Product,
 } from '@/data/catalog'
-import { useCart } from './cart-provider'
-import { useWishlist } from './wishlist-provider'
+
+import { ProductCard } from './product-card'
 
 const PAGE_SIZE = 8
-
-function ProductCard({ product }: { product: Product }) {
-  const { addItem } = useCart()
-  const { has, toggle } = useWishlist()
-
-  const liked = has(product.slug)
-
-  return (
-    <article className="product-card">
-      <Link
-        href={`/products/${product.slug}`}
-        className="card-image"
-      >
-        <div
-          className={`product-art`}
-        >
-          <img
-            src={product.image}
-            alt={product.name}
-          />
-
-          {product.badge && (
-            <span className="badge">
-              {product.badge}
-            </span>
-          )}
-
-          <button
-            type="button"
-            className={`like ${liked ? 'liked' : ''}`}
-            onClick={(event) => {
-              event.preventDefault()
-              event.stopPropagation()
-              toggle(product.slug)
-            }}
-            aria-label={
-              liked
-                ? `Remove ${product.name} from wishlist`
-                : `Add ${product.name} to wishlist`
-            }
-          >
-            <Heart
-              size={18}
-              fill={
-                liked
-                  ? 'currentColor'
-                  : 'none'
-              }
-            />
-          </button>
-        </div>
-      </Link>
-
-      <div className="card-info">
-        <div>
-          <p className="eyebrow">
-            {product.category}
-            {product.subcategory
-              ? ` / ${product.subcategory}`
-              : ''}
-          </p>
-
-          <h3>{product.name}</h3>
-          <p className="subtitle">{product.subtitle}</p>
-        </div>
-
-        <strong>{formatPrice(product.price)}</strong>
-      </div>
-
-      <button
-        className="add-button"
-        onClick={() => addItem(product)}
-      >
-        ADD TO BAG
-        <ArrowUpRight size={16} />
-      </button>
-    </article>
-  )
-}
 
 export function ShopPage({ products, categories }: { products: Product[]; categories: Category[] }) {
   const searchParams = useSearchParams()
@@ -258,7 +178,7 @@ export function ShopPage({ products, categories }: { products: Product[]; catego
 
         {pageProducts.length === 0 && (
           <div className="empty-shop">
-            NO OBJECTS FOUND IN THE LOOP.
+            DROPPING SOON IN THE LOOP.
           </div>
         )}
 

@@ -84,8 +84,6 @@ export function SiteHeader() {
   return (
     <>
       <div className="announcement">
-        FREE SHIPPING ON ORDERS OVER ₹2000
-        <span>•</span>
         FAN-MADE / SMALL-BATCH / BIG ENERGY
       </div>
 
@@ -106,13 +104,9 @@ export function SiteHeader() {
           {categories.map((category) => (
             <Link
               key={category.slug}
-              href={
-                category.slug === 'access-cards'
-                  ? '/access-cards'
-                  : `/shop?category=${encodeURIComponent(
-                      category.name,
-                    )}`
-              }
+              href={`/shop?category=${encodeURIComponent(
+                category.name,
+              )}`}
               onClick={closeMenu}
             >
               {category.name.toUpperCase()}

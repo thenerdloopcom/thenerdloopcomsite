@@ -33,6 +33,8 @@ export function CardPersonalizePage({
   const [instructions, setInstructions] =
     useState('')
 
+  const [uploading, setUploading] = useState(false)
+
   useEffect(() => {
     if (!file) {
       setPreview('')
@@ -47,19 +49,36 @@ export function CardPersonalizePage({
     return () => URL.revokeObjectURL(url)
   }, [file])
 
-  const submit = (
-    event: React.FormEvent,
-  ) => {
+  const submit = async (event: React.FormEvent) => {
     event.preventDefault()
-
     if (!file) return
 
-    addItem(product, 1, {
-      type: 'photo-personalized',
-      imagePreviewUrl: preview,
-      instructions:
-        instructions.trim() || undefined,
-    })
+    setUploading(true)
+    try {
+      const presignRes = await fetch('/api/uploads/presign', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filename: file.name, contentType: file.type, size: file.size }),
+      })
+      const { uploadId, uploadUrl } = await presignRes.json()
+      if (!presignRes.ok) throw new Error('Upload failed')
+
+      await fetch(uploadUrl, { method: 'PUT', headers: { 'Content-Type': file.type }, body: file })
+      await fetch('/api/uploads/confirm', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ uploadId }),
+      })
+
+      addItem(product, 1, {
+        type: 'photo-personalized',
+        imageStorageKey: uploadId,
+        imagePreviewUrl: preview,
+        instructions: instructions.trim() || undefined,
+      })
+    } finally {
+      setUploading(false)
+    }
   }
 
   return (
@@ -193,10 +212,10 @@ export function CardPersonalizePage({
 
                 <button
                   type="submit"
-                  disabled={!file}
+                  disabled={!file || uploading}
                   className="checkout-button"
                 >
-                  ADD TO BAG
+                  {uploading ? 'UPLOADING...' : 'ADD TO BAG'}
                   <ArrowUpRight size={18} />
                 </button>
               </div>

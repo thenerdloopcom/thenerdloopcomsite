@@ -1,97 +1,111 @@
 'use client'
 
-import { useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { ArrowUpRight } from 'lucide-react'
+import type { User } from '@supabase/supabase-js'
 
-export default function AccountPage() {
-  const [mode, setMode] = useState<'login' | 'signup'>(
-    'login',
-  )
+import { createClient } from '@/lib/supabase/client'
 
-  const [submitted, setSubmitted] = useState(false)
+function AccountPageInner() {
+  const supabase = createClient()
+  const searchParams = useSearchParams()
+  const next = searchParams.get('next') ?? '/account'
+
+  const [user, setUser] = useState<User | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      setUser(data.user)
+      setLoading(false)
+    })
+
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null)
+    })
+
+    return () => listener.subscription.unsubscribe()
+  }, [supabase])
+
+  const signInWithGoogle = async () => {
+    setError(null)
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
+      },
+    })
+    if (error) setError(error.message)
+  }
+
+  const signOut = async () => {
+    await supabase.auth.signOut()
+    setUser(null)
+  }
+
+  if (loading) {
+    return (
+      <main className="route-page">
+        <section className="auth-page">
+          <p>LOADING...</p>
+        </section>
+      </main>
+    )
+  }
 
   return (
     <main className="route-page">
       <section className="auth-page">
         <div className="auth-copy">
-          <p className="eyebrow">
-            THE NERDLOOP / YOUR ACCOUNT
-          </p>
+          <p className="eyebrow">THE NERDLOOP / YOUR ACCOUNT</p>
 
           <h1>
-            JOIN THE
-            <span> LOOP.</span>
+            {user ? 'WELCOME BACK,' : 'JOIN THE'}
+            <span> {user ? (user.user_metadata?.full_name ?? 'LOOPER') : 'LOOP.'}</span>
           </h1>
 
           <p>
-            Save your details, track orders and keep your
-            fandom collection in one place.
+            Save your details, track orders and keep your fandom collection
+            in one place.
           </p>
         </div>
 
         <div className="auth-card">
-          <div className="auth-tabs">
-            <button
-              className={mode === 'login' ? 'active' : ''}
-              onClick={() => setMode('login')}
-            >
-              LOGIN
-            </button>
+          {user ? (
+            <div className="auth-signed-in">
+              <p>Signed in as {user.email}</p>
 
-            <button
-              className={mode === 'signup' ? 'active' : ''}
-              onClick={() => setMode('signup')}
-            >
-              SIGN UP
-            </button>
-          </div>
+              <button type="button" className="checkout-button" onClick={signOut}>
+                SIGN OUT
+                <ArrowUpRight size={18} />
+              </button>
+            </div>
+          ) : (
+            <>
+              <button
+                type="button"
+                className="checkout-button"
+                onClick={signInWithGoogle}
+              >
+                CONTINUE WITH GOOGLE
+                <ArrowUpRight size={18} />
+              </button>
 
-          <form
-            onSubmit={(event) => {
-              event.preventDefault()
-              setSubmitted(true)
-
-              // TODO: Supabase Auth integration.
-            }}
-          >
-            {mode === 'signup' && (
-              <input
-                required
-                placeholder="NAME"
-              />
-            )}
-
-            <input
-              required
-              type="email"
-              placeholder="EMAIL"
-            />
-
-            <input
-              required
-              type="password"
-              placeholder="PASSWORD"
-            />
-
-            <button
-              type="submit"
-              className="checkout-button"
-            >
-              {mode === 'login'
-                ? 'LOGIN'
-                : 'CREATE ACCOUNT'}
-              <ArrowUpRight size={18} />
-            </button>
-          </form>
-
-          {submitted && (
-            <p className="auth-placeholder">
-              SUPABASE AUTH PLACEHOLDER — AUTHENTICATION
-              NOT CONNECTED YET.
-            </p>
+              {error && <p className="auth-placeholder">{error}</p>}
+            </>
           )}
         </div>
       </section>
     </main>
+  )
+}
+
+export default function AccountPage() {
+  return (
+    <Suspense fallback={null}>
+      <AccountPageInner />
+    </Suspense>
   )
 }

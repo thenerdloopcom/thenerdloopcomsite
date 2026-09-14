@@ -36,10 +36,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html
-      lang="en"
-      className={`${anton.variable} ${jetbrains.variable}`}
-    >
+    <html lang="en" className={`${anton.variable} ${jetbrains.variable}`}>
       <body className="antialiased">
         <Providers>
           <SiteHeader />
@@ -49,6 +46,8 @@ export default function RootLayout({
         </Providers>
 
         {process.env.NODE_ENV === 'production' && <Analytics />}
+
+        <script src="https://checkout.razorpay.com/v1/checkout.js" async />
       </body>
     </html>
   )

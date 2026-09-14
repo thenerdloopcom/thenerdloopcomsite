@@ -2,13 +2,25 @@
 
 import { useMemo, useState } from 'react'
 import { ArrowUpRight, ShieldCheck } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { formatPrice } from '@/data/catalog'
 import { useCart } from './cart-provider'
 
-export function CheckoutPage() {
-  const { items, subtotal } = useCart()
+declare global {
+  interface Window {
+    Razorpay: new (options: Record<string, unknown>) => {
+      open: () => void
+    }
+  }
+}
 
+export function CheckoutPage() {
+  const router = useRouter()
+  const { items, subtotal, clearCart } = useCart()
+
+  const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const shipping = subtotal >= 200000 ? 0 : 10000
   const total = subtotal + shipping
@@ -37,28 +49,94 @@ export function CheckoutPage() {
     )
   }, [items.length, form])
 
-  const updateField = (
-    key: keyof typeof form,
-    value: string,
-  ) => {
+  const updateField = (key: keyof typeof form, value: string) => {
     setForm((current) => ({
       ...current,
       [key]: value,
     }))
   }
 
-  const submit = (event: React.FormEvent) => {
+  const submit = async (event: React.FormEvent) => {
     event.preventDefault()
 
-    if (!canSubmit) return
+    if (!canSubmit || submitting) return
 
-    setSubmitted(true)
+    setSubmitting(true)
+    setError(null)
 
-    // TODO:
-    // 1. POST /api/checkout
-    // 2. Create internal order
-    // 3. Create Razorpay order
-    // 4. Open Razorpay Checkout
+    try {
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: items.map((item) => ({
+            product_id: item.product.id,
+            quantity: item.quantity,
+            customization_type: item.customization?.type ?? null,
+            instructions: item.customization?.instructions ?? null,
+            upload_id: item.customization?.imageStorageKey ?? null,
+          })),
+          shippingAddress: {
+            full_name: form.name,
+            phone: form.phone,
+            address_line_1: form.line1,
+            address_line_2: form.line2 || undefined,
+            city: form.city,
+            state: form.state,
+            postal_code: form.postalCode,
+          },
+        }),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        throw new Error(data.error ?? 'Checkout failed')
+      }
+
+      const razorpay = new window.Razorpay({
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        amount: data.razorpay.amount,
+        currency: data.razorpay.currency,
+        order_id: data.razorpay.id,
+        name: 'The Nerd Loop',
+        prefill: {
+          name: form.name,
+          email: form.email,
+          contact: form.phone,
+        },
+        handler: async (response: {
+          razorpay_order_id: string
+          razorpay_payment_id: string
+          razorpay_signature: string
+        }) => {
+          await fetch('/api/payments/razorpay/verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              orderId: data.orderId,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+            }),
+          })
+
+          clearCart()
+          setSubmitted(true)
+          router.push(`/order-confirmation?order=${data.orderNumber}`)
+        },
+        modal: {
+          ondismiss: () => {
+            setSubmitting(false)
+          },
+        },
+      })
+
+      razorpay.open()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong')
+      setSubmitting(false)
+    }
   }
 
   if (items.length === 0) {
@@ -83,19 +161,14 @@ export function CheckoutPage() {
           <p className="eyebrow">THE NERDLOOP / CHECKOUT</p>
           <h1>FINAL<br />PANEL.</h1>
 
-          <form
-            className="checkout-form"
-            onSubmit={submit}
-          >
+          <form className="checkout-form" onSubmit={submit}>
             <section className="checkout-section">
               <h2>CONTACT</h2>
 
               <input
                 required
                 value={form.name}
-                onChange={(event) =>
-                  updateField('name', event.target.value)
-                }
+                onChange={(event) => updateField('name', event.target.value)}
                 placeholder="FULL NAME"
               />
 
@@ -103,18 +176,14 @@ export function CheckoutPage() {
                 required
                 type="email"
                 value={form.email}
-                onChange={(event) =>
-                  updateField('email', event.target.value)
-                }
+                onChange={(event) => updateField('email', event.target.value)}
                 placeholder="EMAIL"
               />
 
               <input
                 required
                 value={form.phone}
-                onChange={(event) =>
-                  updateField('phone', event.target.value)
-                }
+                onChange={(event) => updateField('phone', event.target.value)}
                 placeholder="PHONE"
               />
             </section>
@@ -125,17 +194,13 @@ export function CheckoutPage() {
               <input
                 required
                 value={form.line1}
-                onChange={(event) =>
-                  updateField('line1', event.target.value)
-                }
+                onChange={(event) => updateField('line1', event.target.value)}
                 placeholder="ADDRESS LINE 1"
               />
 
               <input
                 value={form.line2}
-                onChange={(event) =>
-                  updateField('line2', event.target.value)
-                }
+                onChange={(event) => updateField('line2', event.target.value)}
                 placeholder="ADDRESS LINE 2"
               />
 
@@ -143,18 +208,14 @@ export function CheckoutPage() {
                 <input
                   required
                   value={form.city}
-                  onChange={(event) =>
-                    updateField('city', event.target.value)
-                  }
+                  onChange={(event) => updateField('city', event.target.value)}
                   placeholder="CITY"
                 />
 
                 <input
                   required
                   value={form.state}
-                  onChange={(event) =>
-                    updateField('state', event.target.value)
-                  }
+                  onChange={(event) => updateField('state', event.target.value)}
                   placeholder="STATE"
                 />
               </div>
@@ -162,12 +223,7 @@ export function CheckoutPage() {
               <input
                 required
                 value={form.postalCode}
-                onChange={(event) =>
-                  updateField(
-                    'postalCode',
-                    event.target.value,
-                  )
-                }
+                onChange={(event) => updateField('postalCode', event.target.value)}
                 placeholder="PINCODE"
               />
             </section>
@@ -175,25 +231,28 @@ export function CheckoutPage() {
             <button
               className="checkout-button"
               type="submit"
-              disabled={!canSubmit}
+              disabled={!canSubmit || submitting}
             >
-              CONTINUE TO PAYMENT
+              {submitting ? 'PROCESSING...' : 'CONTINUE TO PAYMENT'}
               <ArrowUpRight size={18} />
             </button>
+
+            {error && (
+              <div className="payment-placeholder">
+                <ShieldCheck size={20} />
+                <div>
+                  <strong>CHECKOUT ERROR</strong>
+                  <p>{error}</p>
+                </div>
+              </div>
+            )}
 
             {submitted && (
               <div className="payment-placeholder">
                 <ShieldCheck size={20} />
-
                 <div>
-                  <strong>
-                    RAZORPAY PLACEHOLDER
-                  </strong>
-
-                  <p>
-                    Checkout details validated successfully.
-                    Payment integration will be connected here.
-                  </p>
+                  <strong>PAYMENT SUCCESSFUL</strong>
+                  <p>Redirecting to your order confirmation...</p>
                 </div>
               </div>
             )}
@@ -204,20 +263,13 @@ export function CheckoutPage() {
           <p className="eyebrow">YOUR ORDER</p>
 
           {items.map(({ product, quantity }) => (
-            <div
-              key={product.id}
-              className="checkout-line-item"
-            >
+            <div key={product.id} className="checkout-line-item">
               <div>
                 <strong>{product.name}</strong>
                 <span>QTY {quantity}</span>
               </div>
 
-              <span>
-                {formatPrice(
-                  product.price * quantity,
-                )}
-              </span>
+              <span>{formatPrice(product.price * quantity)}</span>
             </div>
           ))}
 
@@ -228,11 +280,7 @@ export function CheckoutPage() {
 
           <div className="checkout-total-row">
             <span>SHIPPING</span>
-            <strong>
-              {shipping === 0
-                ? 'FREE'
-                : formatPrice(shipping)}
-            </strong>
+            <strong>{shipping === 0 ? 'FREE' : formatPrice(shipping)}</strong>
           </div>
 
           <div className="checkout-total-row grand-total">
@@ -240,9 +288,7 @@ export function CheckoutPage() {
             <strong>{formatPrice(total)}</strong>
           </div>
 
-          <p className="demo-note">
-            PAYMENT PROVIDER: RAZORPAY / DEMO MODE
-          </p>
+          <p className="demo-note">PAYMENT PROVIDER: RAZORPAY</p>
         </aside>
       </section>
     </main>

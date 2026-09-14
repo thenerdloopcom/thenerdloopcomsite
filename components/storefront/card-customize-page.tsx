@@ -50,26 +50,42 @@ export function CardCustomizePage({
     return () => URL.revokeObjectURL(url)
   }, [file])
 
-  const submit = (
-    event: React.FormEvent,
-  ) => {
+  const [uploading, setUploading] = useState(false)
+
+  const submit = async (event: React.FormEvent) => {
     event.preventDefault()
 
-    if (
-      !file ||
-      !name.trim() ||
-      !instructions.trim()
-    ) {
+    if (!file || !name.trim() || !instructions.trim()) {
       return
     }
 
-    addItem(product, 1, {
-      type: 'fully-custom',
-      name: name.trim(),
-      imagePreviewUrl: preview,
-      instructions:
-        instructions.trim(),
-    })
+    setUploading(true)
+    try {
+      const presignRes = await fetch('/api/uploads/presign', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filename: file.name, contentType: file.type, size: file.size }),
+      })
+      const { uploadId, uploadUrl } = await presignRes.json()
+      if (!presignRes.ok) throw new Error('Upload failed')
+
+      await fetch(uploadUrl, { method: 'PUT', headers: { 'Content-Type': file.type }, body: file })
+      await fetch('/api/uploads/confirm', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ uploadId }),
+      })
+
+      addItem(product, 1, {
+        type: 'fully-custom',
+        name: name.trim(),
+        imageStorageKey: uploadId,
+        imagePreviewUrl: preview,
+        instructions: instructions.trim(),
+      })
+    } finally {
+      setUploading(false)
+    }
   }
 
   return (
@@ -205,10 +221,11 @@ export function CardCustomizePage({
               disabled={
                 !file ||
                 !name.trim() ||
-                !instructions.trim()
+                !instructions.trim() ||
+                uploading
               }
             >
-              ADD TO BAG
+              {uploading ? 'UPLOADING...' : 'ADD TO BAG'}
               <ArrowUpRight size={18} />
             </button>
           </div>

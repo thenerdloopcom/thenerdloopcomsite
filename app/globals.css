@@ -113,15 +113,14 @@ a {
   align-items: center;
   justify-content: center;
   line-height: 0;
-  background: var(--foreground);
   padding: 6px 10px;
 }
 
 .site-header .wordmark img {
   display: block;
-  width: 145px;
+  width: 200px;
   height: auto;
-  max-height: 42px;
+  max-height: 75px;
   object-fit: contain;
 }
 
@@ -1666,6 +1665,12 @@ footer .wordmark img {
 
 .customization-submit strong {
   font: 900 22px 'Arial Black';
+}
+
+.checkout-order-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 

@@ -132,3 +132,20 @@ export async function getMyOrderByNumber(orderNumber: string): Promise<OrderWith
   if (error) throw error
   return data as unknown as OrderWithRelations | null
 }
+
+export type OrderSummary = Pick<
+  Database['public']['Tables']['orders']['Row'],
+  'id' | 'order_number' | 'status' | 'payment_status' | 'fulfillment_status' | 'total' | 'created_at'
+> & { order_items: { product_name: string; quantity: number }[] }
+
+/** List the signed-in user's own orders, newest first. RLS-scoped. */
+export async function getMyOrders(): Promise<OrderSummary[]> {
+  const supabase = await createSessionClient()
+  const { data, error } = await supabase
+    .from('orders')
+    .select('id, order_number, status, payment_status, fulfillment_status, total, created_at, order_items(product_name, quantity)')
+    .order('created_at', { ascending: false })
+
+  if (error) throw error
+  return data as unknown as OrderSummary[]
+}

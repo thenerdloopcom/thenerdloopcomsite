@@ -203,49 +203,9 @@ export function Storefront() {
             </div>
           </div>
 
-          <div className="hero-art relative group">
-            <div className="w-full h-full flex items-center justify-center bg-blue-600 overflow-hidden relative">
-              <ProductArt
-                product={products[0]}
-                large
-              />
-
-              <Link
-                href={`/products/${products[0].slug}`}
-                aria-label={`View ${products[0].name}`}
-                className="absolute inset-0"
-              />
-
-              <div className="absolute inset-0 flex items-center justify-between px-4 pointer-events-none">
-                <button
-                  type="button"
-                  className="bg-white/20 p-2 rounded-full"
-                  aria-label="Previous featured product"
-                >
-                  <ChevronLeft />
-                </button>
-
-                <button
-                  type="button"
-                  className="bg-white/20 p-2 rounded-full"
-                  aria-label="Next featured product"
-                >
-                  <ChevronRight />
-                </button>
-              </div>
-
-              <div className="absolute bottom-8 flex gap-2">
-                <span className="w-2 h-2 bg-white rounded-full" />
-                <span className="w-2 h-2 bg-white/40 rounded-full" />
-                <span className="w-2 h-2 bg-white/40 rounded-full" />
-              </div>
-            </div>
-
-            <div className="price-sticker">
-              FROM
-              <br />
-              <b>₹199</b>
-            </div>
+          <div className="hero-art relative group rounded-tl-4xl overflow-hidden mt-16 border-t-2 border-l-2 border-black">
+            {/* Empty for now — carousel images to be added here later */}
+            {/* <div className="w-full h-full bg-blue-600" /> */}
           </div>
         </section>
 

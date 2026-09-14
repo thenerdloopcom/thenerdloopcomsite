@@ -115,7 +115,7 @@ export function CardPersonalizePage({
 
           <div className="card-customization-form">
             <p className="eyebrow">
-              PHOTO PERSONALIZED
+              {/* PHOTO PERSONALIZED */}
             </p>
 
             <h1>

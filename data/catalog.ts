@@ -70,7 +70,7 @@ export const products: Product[] = [
   {
     id: 'tva-001',
     slug: 'tva-access-card',
-    name: 'Time Variance Authority Access Card',
+    name: 'TVA Access Card 101',
     subtitle: 'Personalized TVA Credential',
     price: 39900,
 
@@ -80,7 +80,7 @@ export const products: Product[] = [
     cardType: 'photo-personalized',
     hasBackView: true,
 
-    badge: 'PERSONALIZED',
+    badge: 'CUSTOMIZE IT',
     color: 'orange',
 
     personalization: {
@@ -124,7 +124,7 @@ export const products: Product[] = [
     productType: 'access-card',
     cardType: 'ready-made',
 
-    badge: 'READY-MADE',
+    badge: '',
     color: 'black',
 
     description:

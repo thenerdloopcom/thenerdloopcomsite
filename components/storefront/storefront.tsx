@@ -6,20 +6,14 @@ import {
   ArrowUpRight,
   ChevronLeft,
   ChevronRight,
-  Filter,
-  Heart,
 } from 'lucide-react'
 
 import {
-  categories,
-  formatPrice,
-  products,
   type Product,
-  logoImage,
+  type Category,
 } from '@/data/catalog'
 
-import { useCart } from './cart-provider'
-import { useWishlist } from './wishlist-provider'
+import { ProductCard } from './product-card'
 
 const colorClass: Record<string, string> = {
   red: 'product-red',
@@ -28,116 +22,13 @@ const colorClass: Record<string, string> = {
   yellow: 'product-yellow',
 }
 
-function ProductArt({
-  product,
-  large = false,
-  image,
+export function Storefront({
+  products,
+  categories,
 }: {
-  product: Product
-  large?: boolean
-  image?: string
+  products: Product[]
+  categories: Category[]
 }) {
-  return (
-    <div
-      className={`product-art ${
-        colorClass[product.color] || 'product-black'
-      } ${large ? 'product-art-large' : ''}`}
-    >
-      <img
-        src={image || product.image}
-        alt={`${product.name} graphic artwork`}
-      />
-
-      <span className="art-label">
-        TNL / {product.name}
-      </span>
-
-      <span className="art-burst">
-        OOF!
-      </span>
-    </div>
-  )
-}
-
-function ProductCard({
-  product,
-}: {
-  product: Product
-}) {
-  const { addItem } = useCart()
-  const { has, toggle } = useWishlist()
-
-  const liked = has(product.slug)
-
-  return (
-    <article className="product-card">
-      <Link
-        href={`/products/${product.slug}`}
-        className="card-image"
-      >
-        <ProductArt product={product} />
-
-        {product.badge && (
-          <span className="badge">
-            {product.badge}
-          </span>
-        )}
-
-        <button
-          type="button"
-          className={`like ${liked ? 'liked' : ''}`}
-          onClick={(event) => {
-            event.preventDefault()
-            event.stopPropagation()
-            toggle(product.slug)
-          }}
-          aria-label={
-            liked
-              ? `Remove ${product.name} from wishlist`
-              : `Add ${product.name} to wishlist`
-          }
-        >
-          <Heart
-            size={18}
-            fill={liked ? 'currentColor' : 'none'}
-          />
-        </button>
-      </Link>
-
-      <div className="card-info">
-        <div>
-          <p className="eyebrow">
-            {product.category}
-            {product.subcategory
-              ? ` / ${product.subcategory}`
-              : ''}
-          </p>
-
-          <h3>{product.name}</h3>
-
-          <p className="subtitle">
-            {product.subtitle}
-          </p>
-        </div>
-
-        <strong>
-          {formatPrice(product.price)}
-        </strong>
-      </div>
-
-      <button
-        type="button"
-        className="add-button"
-        onClick={() => addItem(product, 1)}
-      >
-        ADD TO BAG
-        <ArrowUpRight size={16} />
-      </button>
-    </article>
-  )
-}
-
-export function Storefront() {
   const [activeCategory, setActiveCategory] = useState('All')
   const [activeSubcategory, setActiveSubcategory] =
     useState('All')
@@ -394,7 +285,7 @@ export function Storefront() {
 
           {filteredProducts.length === 0 && (
             <div className="empty-shop">
-              NO OBJECTS FOUND IN THE LOOP.
+              DROPPING SOON IN THE LOOP.
             </div>
           )}
 

@@ -90,7 +90,7 @@ export function CartDrawer() {
                     {customization?.type ===
                       'photo-personalized' && (
                       <p className="cart-custom-label">
-                        PERSONALIZED
+                        CUSTOMIZE IT
                       </p>
                     )}
 

@@ -169,7 +169,7 @@ a {
 }
 
 .shop-section:nth-of-type(odd) {
-  background: var(--yellow);
+  background: var(--paper);
 }
 
 .wordmark span {
@@ -1323,56 +1323,6 @@ footer .wordmark img {
   background: #8b3dff;
 }
 
-.access-cards-page {
-  padding: 8vw 5vw;
-  max-width: 1400px;
-  margin: 0 auto;
-}
-
-.access-cards-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: end;
-  gap: 40px;
-  margin-bottom: 60px;
-}
-
-.access-cards-header h1 {
-  font: 400 clamp(56px, 8vw, 110px) /.8
-    var(--font-anton), Impact, sans-serif;
-  letter-spacing: -.04em;
-  margin: 0;
-}
-
-.access-cards-header h1 span {
-  color: var(--blue);
-}
-
-.access-cards-header p:last-child {
-  max-width: 520px;
-  margin: 28px 0 0;
-  line-height: 1.6;
-}
-
-.access-card-count {
-  font: 700 11px monospace;
-  white-space: nowrap;
-}
-
-.access-card-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 42px 24px;
-}
-
-.access-card-item {
-  min-width: 0;
-}
-
-.access-card-art {
-  display: block;
-}
-
 .card-art-frame {
   position: relative;
   width: 100%;
@@ -1386,10 +1336,6 @@ footer .wordmark img {
     box-shadow .16s ease;
 }
 
-.access-card-art:hover .card-art-frame {
-  transform: translate(-3px, -3px);
-  box-shadow: 12px 12px 0 var(--line);
-}
 
 .card-art-frame img {
   position: absolute;
@@ -1409,41 +1355,6 @@ footer .wordmark img {
 .card-back-image {
   opacity: 0;
   z-index: 2;
-}
-
-.access-card-art.has-back-view:hover .card-front-image {
-  opacity: 0;
-}
-
-.access-card-art.has-back-view:hover .card-back-image {
-  opacity: 1;
-}
-
-.access-card-info {
-  display: flex;
-  justify-content: space-between;
-  align-items: start;
-  gap: 20px;
-  padding: 18px 0 12px;
-}
-
-.access-card-info h2 {
-  margin: 0;
-  font: 900 20px 'Arial Black', sans-serif;
-  letter-spacing: -.05em;
-}
-
-.access-card-info .eyebrow {
-  margin-bottom: 8px;
-}
-
-.access-card-info strong {
-  font: 700 13px monospace;
-  white-space: nowrap;
-}
-
-.access-card-item > .add-button {
-  text-align: left;
 }
 
 
@@ -1895,6 +1806,25 @@ footer .wordmark img {
 }
 
 
+.customize-tag {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  z-index: 3;
+
+  padding: 7px 10px;
+
+  background: var(--red);
+  color: var(--white);
+
+  border: 2px solid var(--line);
+
+  font: 900 10px/1 'Arial Black', sans-serif;
+  letter-spacing: 0.02em;
+
+  box-shadow: 3px 3px 0 var(--line);
+}
+
 /* ========================================
    CONTACT RESPONSIVE
    ======================================== */
@@ -2182,6 +2112,67 @@ footer .wordmark img {
 }
 
 /* ========================================
+   CARD PURCHASE OPTIONS
+   ======================================== */
+
+.card-purchase-options {
+  margin: 28px 0;
+}
+
+.card-purchase-options > .eyebrow {
+  margin-bottom: 10px;
+}
+
+.card-purchase-option {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+
+  padding: 16px 18px;
+
+  border: 2px solid var(--line);
+  background: var(--paper);
+
+  text-align: left;
+
+  transition:
+    background 0.15s ease,
+    transform 0.15s ease;
+}
+
+.card-purchase-option + .card-purchase-option {
+  border-top: 0;
+}
+
+.card-purchase-option > span:first-child {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.card-purchase-option strong {
+  font: 900 12px 'Arial Black', sans-serif;
+  letter-spacing: 0.02em;
+}
+
+.card-purchase-option small {
+  font: 10px/1.4 monospace;
+  color: var(--muted);
+}
+
+.card-purchase-option.selected,
+.card-purchase-option:hover {
+  background: var(--yellow);
+}
+
+.purchase-option-indicator {
+  font-size: 18px;
+  line-height: 1;
+}
+
+/* ========================================
    RESPONSIVE
    ======================================== */
 
@@ -2276,15 +2267,6 @@ footer .wordmark img {
     max-height: 32px;
   }
 
-  .access-cards-header {
-    align-items: start;
-    flex-direction: column;
-  }
-
-  .access-card-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
   .card-customization-layout {
     grid-template-columns: 1fr;
   }
@@ -2340,15 +2322,6 @@ footer .wordmark img {
   .card-info strong {
     display: block;
     margin-top: 8px;
-  }
-
-  .access-card-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .access-card-info {
-    flex-direction: column;
-    gap: 8px;
   }
 
   .customization-submit {

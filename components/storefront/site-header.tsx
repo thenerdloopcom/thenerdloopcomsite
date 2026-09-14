@@ -1,11 +1,63 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { Heart, Menu, Search, ShoppingBag, User, X } from 'lucide-react'
 import { categories, logoImage } from '@/data/catalog'
 import { useCart } from './cart-provider'
 import { useWishlist } from './wishlist-provider'
+import { createClient } from '@/lib/supabase/client'
+
+function AccountMenu() {
+  const supabase = createClient()
+
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null)
+  const [open, setOpen] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setIsLoggedIn(!!data.user))
+    const { data: listener } = supabase.auth.onAuthStateChange((_e, session) => {
+      setIsLoggedIn(!!session?.user)
+    })
+    return () => listener.subscription.unsubscribe()
+  }, [supabase])
+
+  useEffect(() => {
+    const onClickOutside = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('click', onClickOutside)
+    return () => document.removeEventListener('click', onClickOutside)
+  }, [])
+
+  if (!isLoggedIn) {
+    return (
+      <Link href="/account" aria-label="Account">
+        <User size={20} />
+      </Link>
+    )
+  }
+
+  return (
+    <div ref={menuRef} className="account-menu">
+      <button aria-label="Account menu" onClick={() => setOpen((v) => !v)}>
+        <User size={20} />
+      </button>
+
+      {open && (
+        <div className="account-dropdown">
+          <Link href="/account" onClick={() => setOpen(false)}>
+            MY PROFILE
+          </Link>
+          <Link href="/orders" onClick={() => setOpen(false)}>
+            ORDERS
+          </Link>
+        </div>
+      )}
+    </div>
+  )
+}
 
 export function SiteHeader() {
   const { count, openCart } = useCart()
@@ -73,13 +125,6 @@ export function SiteHeader() {
         </nav>
 
         <div className="header-actions">
-          <button
-            aria-label="Search"
-            onClick={() => setSearchOpen((value) => !value)}
-          >
-            <Search size={20} />
-          </button>
-
           <Link
             href="/wishlist"
             aria-label="Wishlist"
@@ -89,9 +134,7 @@ export function SiteHeader() {
             {wishlist.length > 0 && <b>{wishlist.length}</b>}
           </Link>
 
-          <Link href="/account" aria-label="Account">
-            <User size={20} />
-          </Link>
+          <AccountMenu />
 
           <button
             aria-label="Open cart"

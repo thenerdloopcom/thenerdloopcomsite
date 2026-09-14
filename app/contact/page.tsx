@@ -1,7 +1,5 @@
-import { SimpleInfoPage } from '@/components/storefront/simple-info-page'
+import { ContactPage } from '@/components/storefront/contact-page'
 
-export default function Returns() {
-  return (
-    <SimpleInfoPage page="contact" />
-  )
+export default function Page() {
+  return <ContactPage />
 }

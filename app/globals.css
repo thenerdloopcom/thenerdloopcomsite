@@ -108,6 +108,21 @@ a {
   z-index: 4;
 }
 
+.site-header nav {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 34px;
+
+  margin: 0;
+  font: 700 11px 'Courier New', monospace;
+  letter-spacing: .08em;
+}
+
 .site-header .wordmark {
   display: inline-flex;
   align-items: center;
@@ -161,14 +176,6 @@ a {
   color: var(--red);
 }
 
-.site-header nav {
-  display: flex;
-  gap: 34px;
-  margin-left: 10vw;
-  font: 700 11px 'Courier New', monospace;
-  letter-spacing: .08em;
-}
-
 .site-header nav a:hover,
 footer a:hover {
   color: var(--red);
@@ -211,7 +218,7 @@ footer a:hover {
 }
 
 .mobile-menu {
-  display: none;
+  display: none !important;
 }
 
 .search-wrap {
@@ -1673,6 +1680,506 @@ footer .wordmark img {
   gap: 8px;
 }
 
+/* Append everything below to app/globals.css */
+
+.account-menu {
+  position: relative;
+}
+
+.account-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  min-width: 180px;
+  background: #fff;
+  border: 2px solid #000;
+  box-shadow: 4px 4px 0 #000;
+  display: flex;
+  flex-direction: column;
+  z-index: 50;
+}
+
+.account-dropdown a {
+  padding: 14px 18px;
+  font-family: var(--font-jetbrains-mono);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  color: #000;
+  border-bottom: 1px solid #eee;
+  transition: background 0.15s ease;
+}
+
+.account-dropdown a:last-child {
+  border-bottom: none;
+}
+
+.account-dropdown a:hover {
+  background: #fff4a8;
+}
+
+/* ========================================
+   CONTACT PAGE
+   ======================================== */
+
+.contact-page {
+  width: min(1400px, calc(100% - 120px));
+  min-height: calc(100vh - 160px);
+
+  margin: 0 auto;
+  padding: 80px 0;
+
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(480px, 0.9fr);
+
+  gap: 60px;
+  align-items: start;
+}
+
+
+/* ----------------------------------------
+   LEFT / INTRO
+   ---------------------------------------- */
+
+.contact-intro {
+  padding-top: 10px;
+}
+
+.contact-intro .eyebrow {
+  margin: 0 0 22px;
+
+  font: 700 11px monospace;
+  letter-spacing: .12em;
+}
+
+.contact-intro h1 {
+  margin: 0;
+
+  font: 400 clamp(90px, 10vw, 170px) /.82
+    var(--font-anton), Impact, sans-serif;
+
+  letter-spacing: -.055em;
+}
+
+.contact-intro h1 span {
+  color: var(--blue);
+}
+
+.contact-description {
+  max-width: 560px;
+
+  margin: 35px 0 0;
+
+  font: 18px/1.5 var(--font-jetbrains-mono), monospace;
+}
+
+
+/* ----------------------------------------
+   RIGHT / CONTACT LINKS
+   ---------------------------------------- */
+
+.contact-links {
+  display: flex;
+  flex-direction: column;
+
+  gap: 18px;
+
+  padding-top: 8px;
+}
+
+
+/* ----------------------------------------
+   COMIC BUTTONS
+   ---------------------------------------- */
+
+.contact-box {
+  min-height: 74px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 28px;
+
+  border: 2px solid var(--line);
+
+  box-shadow: 7px 7px 0 var(--line);
+
+  font: 900 16px 'Arial Black', sans-serif;
+  letter-spacing: .02em;
+
+  color: var(--foreground);
+
+  transition:
+    transform .15s ease,
+    box-shadow .15s ease;
+}
+
+.contact-box svg {
+  flex: 0 0 auto;
+  transition: transform .15s ease;
+}
+
+
+/* YOUR BRAND COLORS */
+
+.contact-box.box-email {
+  background: var(--yellow);
+}
+
+.contact-box.box-instagram {
+  background: var(--red);
+  color: var(--paper);
+}
+
+.contact-box.box-whatsapp {
+  background: var(--red);
+  color: var(--paper);
+}
+
+
+/* COMIC HOVER */
+
+.contact-box:hover {
+  transform: translate(-4px, -4px);
+
+  box-shadow: 11px 11px 0 var(--line);
+}
+
+.contact-box:hover svg {
+  transform: translate(3px, -3px);
+}
+
+
+/* ----------------------------------------
+   LOCATION CARD
+   ---------------------------------------- */
+
+.contact-meta {
+  margin-top: 2px;
+
+  padding: 25px 28px 27px;
+
+  border: 2px solid var(--line);
+
+  background: var(--paper);
+
+  box-shadow: 7px 7px 0 var(--line);
+}
+
+.contact-meta h3 {
+  margin: 0 0 18px;
+
+  font: 700 10px monospace;
+  letter-spacing: .12em;
+
+  color: var(--muted);
+}
+
+.contact-meta p {
+  margin: 0;
+
+  font: 900 17px/1.4 'Arial Black', sans-serif;
+  letter-spacing: -.02em;
+}
+
+.contact-meta small {
+  display: block;
+
+  margin-top: 18px;
+
+  font: 11px/1.5 monospace;
+
+  color: var(--muted);
+}
+
+
+/* ========================================
+   CONTACT RESPONSIVE
+   ======================================== */
+
+@media (max-width: 900px) {
+  .contact-page {
+    width: min(100% - 48px, 650px);
+
+    grid-template-columns: 1fr;
+
+    gap: 60px;
+
+    padding: 60px 0 80px;
+  }
+
+  .contact-intro h1 {
+    font-size: clamp(75px, 17vw, 130px);
+  }
+
+  .contact-description {
+    max-width: 500px;
+  }
+
+  .contact-links {
+    padding-top: 0;
+  }
+}
+
+
+@media (max-width: 480px) {
+  .contact-page {
+    width: calc(100% - 28px);
+
+    padding: 45px 0 70px;
+
+    gap: 45px;
+  }
+
+  .contact-intro h1 {
+    font-size: 72px;
+  }
+
+  .contact-description {
+    font-size: 14px;
+  }
+
+  .contact-box {
+    min-height: 64px;
+
+    padding: 0 18px;
+
+    font-size: 13px;
+
+    box-shadow: 5px 5px 0 var(--line);
+  }
+
+  .contact-meta {
+    padding: 20px;
+
+    box-shadow: 5px 5px 0 var(--line);
+  }
+
+  .contact-meta p {
+    font-size: 14px;
+  }
+}
+
+/* Orders page tabs */
+.orders-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.orders-tab {
+  padding: 10px 18px;
+  font-family: var(--font-jetbrains-mono);
+  font-weight: 700;
+  font-size: 13px;
+  border: 2px solid #000;
+  background: #fff;
+  cursor: pointer;
+}
+
+.orders-tab.active {
+  background: #000;
+  color: #fff;
+}
+
+/* Order status color */
+.status-blue {
+  color: #2b4bff;
+  font-weight: 700;
+}
+
+/* ========================================
+   ABOUT PAGE
+   ======================================== */
+
+.about-page {
+  background: var(--paper);
+}
+
+.about-container {
+  width: min(1100px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 5vw 0 10vw;
+}
+
+/* ----------------------------------------
+   INTRO
+   ---------------------------------------- */
+
+.about-intro {
+  max-width: 650px;
+  margin-left: 12%;
+  margin-bottom: 80px;
+}
+
+.about-intro .eyebrow {
+  margin-bottom: 18px;
+}
+
+.about-intro h1 {
+  font: 400 clamp(56px, 7vw, 100px) /.82
+    var(--font-anton), Impact, sans-serif;
+
+  letter-spacing: -.04em;
+  margin: 0;
+}
+
+.about-intro h1 span {
+  color: var(--blue);
+}
+
+.about-lead {
+  max-width: 570px;
+  margin: 30px 0 0;
+
+  font-size: 17px;
+  line-height: 1.55;
+}
+
+/* ----------------------------------------
+   CONTENT LAYOUT
+   ---------------------------------------- */
+
+.about-content {
+  display: grid;
+  grid-template-columns: 230px minmax(0, 1fr);
+  gap: 70px;
+
+  padding-left: 12%;
+}
+
+/* ----------------------------------------
+   SIDEBAR
+   ---------------------------------------- */
+
+.about-sidebar {
+  position: sticky;
+  top: 30px;
+  align-self: start;
+}
+
+.about-sidebar-title {
+  margin: 0 0 18px;
+
+  font: 900 12px monospace;
+  letter-spacing: .12em;
+}
+
+.about-sidebar nav {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 9px;
+}
+
+.about-sidebar a {
+  font: 700 10px monospace;
+  letter-spacing: .04em;
+
+  color: var(--foreground);
+
+  transition: color .15s ease;
+}
+
+.about-sidebar a:hover {
+  color: var(--red);
+}
+
+/* ----------------------------------------
+   MAIN SECTIONS
+   ---------------------------------------- */
+
+.about-sections {
+  min-width: 0;
+}
+
+.about-section {
+  border-top: 2px solid var(--line);
+  padding: 0 0 55px;
+}
+
+.about-section:first-child {
+  padding-top: 0;
+}
+
+.about-section h2 {
+  margin: 0;
+  padding: 7px 0 25px;
+
+  font: 900 22px 'Arial Black', sans-serif;
+  letter-spacing: -.04em;
+}
+
+.about-section p {
+  max-width: 760px;
+  margin: 0;
+
+  font-size: 16px;
+  line-height: 1.65;
+}
+
+
+/* ========================================
+   ABOUT RESPONSIVE
+   ======================================== */
+
+@media (max-width: 800px) {
+  .about-container {
+    width: min(100% - 32px, 650px);
+    padding: 50px 0 80px;
+  }
+
+  .about-intro {
+    margin-left: 0;
+    margin-bottom: 60px;
+  }
+
+  .about-content {
+    grid-template-columns: 1fr;
+    gap: 35px;
+    padding-left: 0;
+  }
+
+  .about-sidebar {
+    position: static;
+  }
+
+  .about-sidebar nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px 18px;
+  }
+
+  .about-section {
+    padding-bottom: 45px;
+  }
+}
+
+@media (max-width: 480px) {
+  .about-container {
+    width: calc(100% - 28px);
+    padding-top: 40px;
+  }
+
+  .about-intro h1 {
+    font-size: 58px;
+  }
+
+  .about-lead {
+    font-size: 15px;
+  }
+
+  .about-section h2 {
+    font-size: 19px;
+  }
+
+  .about-section p {
+    font-size: 14px;
+    line-height: 1.6;
+  }
+}
 
 /* ========================================
    RESPONSIVE
@@ -1698,10 +2205,14 @@ footer .wordmark img {
     top: 76px;
     left: 0;
     right: 0;
+    transform: none;
+
     background: var(--paper);
     border-bottom: 2px solid var(--line);
     padding: 22px 5vw;
+
     flex-direction: column;
+    align-items: flex-start;
     margin: 0;
     gap: 18px;
   }
@@ -1711,7 +2222,9 @@ footer .wordmark img {
   }
 
   .mobile-menu {
-    display: block;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
   }
 
   .hero {

@@ -1,37 +1,75 @@
-/**
- * Razorpay Payment Provider Placeholder
- * Follows the architecture from the Backend Specification.
- */
+import 'server-only'
+import Razorpay from 'razorpay'
+import crypto from 'crypto'
 
-export interface RazorpayOrder {
-  id: string;
-  amount: number;
-  currency: string;
-  receipt: string;
-  status: string;
+/**
+ * Real implementation, replaces the mocked lib/providers/razorpay.ts
+ * placeholder already in the repo. Only import this from server code
+ * (route handlers) — it uses the Razorpay key secret.
+ */
+function getRazorpayClient() {
+  return new Razorpay({
+    key_id: process.env.RAZORPAY_KEY_ID!,
+    key_secret: process.env.RAZORPAY_KEY_SECRET!,
+  })
 }
 
-export const createRazorpayOrder = async (amount: number, orderId: string): Promise<RazorpayOrder> => {
-  console.log(`[Razorpay] Creating order for ${amount} paise, Receipt: ${orderId}`);
-  
-  // In a real implementation, this would call the Razorpay API
-  // const response = await razorpay.orders.create({ amount, currency: 'INR', receipt: orderId });
-  
-  return {
-    id: `rzp_test_${Math.random().toString(36).substring(7)}`,
+export interface RazorpayOrder {
+  id: string
+  amount: number
+  currency: string
+  receipt: string
+  status: string
+}
+
+/**
+ * amount must be in the smallest currency unit (paise for INR),
+ * matching how `products.price` / `orders.total` are already stored.
+ */
+export async function createRazorpayOrder(amount: number, receipt: string): Promise<RazorpayOrder> {
+  const client = getRazorpayClient()
+  const order = await client.orders.create({
     amount,
     currency: 'INR',
-    receipt: orderId,
-    status: 'created',
-  };
-};
+    receipt,
+  })
 
-export const verifyPayment = async (paymentId: string, orderId: string, signature: string): Promise<boolean> => {
-  console.log(`[Razorpay] Verifying payment: ${paymentId} for order: ${orderId}`);
-  
-  // In a real implementation, this would verify the signature
-  // const generated_signature = hmac_sha256(orderId + "|" + paymentId, secret);
-  // return generated_signature === signature;
-  
-  return true;
-};
+  return {
+    id: order.id,
+    amount: Number(order.amount),
+    currency: order.currency,
+    receipt: order.receipt ?? receipt,
+    status: order.status,
+  }
+}
+
+/**
+ * Verifies the signature Razorpay Checkout returns to the browser after
+ * a successful payment. Call this from your /api/payments/razorpay/verify
+ * route BEFORE marking an order as paid — never trust the browser alone.
+ */
+export function verifyPaymentSignature(
+  razorpayOrderId: string,
+  razorpayPaymentId: string,
+  razorpaySignature: string,
+): boolean {
+  const expected = crypto
+    .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET!)
+    .update(`${razorpayOrderId}|${razorpayPaymentId}`)
+    .digest('hex')
+
+  return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(razorpaySignature))
+}
+
+/**
+ * Verifies the signature Razorpay sends on webhook requests
+ * (X-Razorpay-Signature header) against the raw request body.
+ */
+export function verifyWebhookSignature(rawBody: string, signature: string): boolean {
+  const expected = crypto
+    .createHmac('sha256', process.env.RAZORPAY_WEBHOOK_SECRET!)
+    .update(rawBody)
+    .digest('hex')
+
+  return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(signature))
+}

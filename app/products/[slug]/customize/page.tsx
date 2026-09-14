@@ -1,18 +1,12 @@
 import { notFound } from 'next/navigation'
-
-import {
-  getProduct,
-  products,
-} from '@/data/catalog'
+import { getProduct, getActiveProducts } from '@/lib/ecommerce/products'
 import { CardCustomizePage } from '@/components/storefront/card-customize-page'
 
 
 
-export function generateStaticParams() {
-  return products
-    .map((product) => ({
-      slug: product.slug,
-    }))
+export async function generateStaticParams() {
+  const products = await getActiveProducts()
+  return products.map((product) => ({ slug: product.slug }))
 }
 
 export default async function Page({
@@ -22,7 +16,7 @@ export default async function Page({
 }) {
   const { slug } = await params
 
-  const product = getProduct(slug)
+  const product = await getProduct(slug)
 
   if (
     !product

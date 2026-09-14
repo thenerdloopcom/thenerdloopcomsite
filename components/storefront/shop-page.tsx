@@ -6,9 +6,8 @@ import { ArrowUpRight, ChevronLeft, ChevronRight, Heart } from 'lucide-react'
 import { useSearchParams, useRouter } from 'next/navigation'
 
 import {
-  categories,
   formatPrice,
-  products,
+  type Category,
   type Product,
 } from '@/data/catalog'
 import { useCart } from './cart-provider'
@@ -95,7 +94,7 @@ function ProductCard({ product }: { product: Product }) {
   )
 }
 
-export function ShopPage() {
+export function ShopPage({ products, categories }: { products: Product[]; categories: Category[] }) {
   const searchParams = useSearchParams()
   const router = useRouter()
 

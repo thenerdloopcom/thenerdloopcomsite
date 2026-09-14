@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { ArrowUpRight } from 'lucide-react'
 
 import {
-  products,
   formatPrice,
   type Product,
 } from '@/data/catalog'
@@ -98,7 +97,7 @@ function CardItem({
   )
 }
 
-export function AccessCardsPage() {
+export function AccessCardsPage({ products }: { products: Product[] }) {
   const cards = products.filter(
     (product) =>
       product.productType === 'access-card' &&

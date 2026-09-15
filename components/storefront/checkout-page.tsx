@@ -1,10 +1,12 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { ArrowUpRight, ShieldCheck } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { formatPrice } from '@/data/catalog'
 import { useCart } from './cart-provider'
+import { createClient } from '@/lib/supabase/client'
+import type { User } from '@supabase/supabase-js'
 
 declare global {
   interface Window {
@@ -16,6 +18,7 @@ declare global {
 
 export function CheckoutPage() {
   const router = useRouter()
+  const supabase = createClient()
   const { items, subtotal, clearCart } = useCart()
 
   const [submitting, setSubmitting] = useState(false)
@@ -35,6 +38,91 @@ export function CheckoutPage() {
     state: '',
     postalCode: '',
   })
+
+  useEffect(() => {
+    const loadSavedAddress = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+
+      if (!user) return
+
+      const { data: address, error } = await supabase
+        .from('addresses')
+        .select(
+          'full_name, phone, address_line_1, address_line_2, city, state, postal_code'
+        )
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+
+      if (error) {
+        console.error('[checkout] Failed to load saved address:', error)
+        return
+      }
+
+      if (address) {
+        setForm((current) => ({
+          ...current,
+          name: address.full_name,
+          phone: address.phone ?? '',
+          line1: address.address_line_1,
+          line2: address.address_line_2 ?? '',
+          city: address.city,
+          state: address.state,
+          postalCode: address.postal_code,
+        }))
+      }
+    }
+
+    loadSavedAddress()
+  }, [supabase])
+
+  const saveAddress = async () => {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) return
+
+  const addressPayload = {
+    user_id: user.id,
+    full_name: form.name,
+    phone: form.phone,
+    address_line_1: form.line1,
+    address_line_2: form.line2 || null,
+    city: form.city,
+    state: form.state,
+    postal_code: form.postalCode,
+    country: 'IN',
+  }
+
+  const { data: existingAddress, error: lookupError } = await supabase
+      .from('addresses')
+      .select('id')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+
+    if (lookupError) throw lookupError
+
+    if (existingAddress) {
+      const { error } = await supabase
+        .from('addresses')
+        .update(addressPayload)
+        .eq('id', existingAddress.id)
+
+      if (error) throw error
+    } else {
+      const { error } = await supabase
+        .from('addresses')
+        .insert(addressPayload)
+
+      if (error) throw error
+    }
+  }
 
   const canSubmit = useMemo(() => {
     return (
@@ -65,6 +153,7 @@ export function CheckoutPage() {
     setError(null)
 
     try {
+      await saveAddress()
       const res = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

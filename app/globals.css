@@ -102,7 +102,7 @@ a {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 5vw;
+  padding: 2vw;
   background: var(--yellow);
   position: relative;
   z-index: 4;
@@ -128,7 +128,7 @@ a {
   align-items: center;
   justify-content: center;
   line-height: 0;
-  padding: 6px 10px;
+  padding: 6px 0px;
 }
 
 .site-header .wordmark img {
@@ -530,6 +530,7 @@ footer a:hover {
   background: transparent;
   padding: 8px 14px;
   font: 700 10px monospace;
+  white-space: nowrap;
 }
 
 .filter-row button.active,
@@ -552,6 +553,8 @@ footer a:hover {
 
 .product-card {
   min-width: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .card-image {
@@ -617,6 +620,7 @@ footer a:hover {
 
 .add-button {
   width: 100%;
+  margin-top: auto;
   display: flex;
   justify-content: space-between;
   background: transparent;
@@ -752,6 +756,11 @@ footer .wordmark img {
   height: auto;
   max-height: 36px;
   object-fit: contain;
+}
+
+.card-info {
+  color: inherit;
+  text-decoration: none;
 }
 
 
@@ -2278,6 +2287,43 @@ footer .wordmark img {
   .personalized-card-preview {
     max-width: 100%;
   }
+  .route-content {
+    grid-template-columns: 1fr;
+    gap: 36px;
+    padding: 36px 5vw 60px;
+    align-items: start;
+  }
+
+  .product-gallery {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .product-detail {
+    width: 100%;
+  }
+
+  .card-gallery-main {
+    width: min(68vw, 300px);
+    aspect-ratio: 2.5 / 3.5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .card-gallery-main img {
+    width: 100%;
+    height: 100%;
+    max-height: none;
+    object-fit: contain;
+  }
+
+  .gallery-controls {
+    justify-content: center;
+    margin-top: 22px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -2327,5 +2373,19 @@ footer .wordmark img {
   .customization-submit {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .product-card .product-art {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+  }
+
+  .product-card .product-art img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
   }
 }

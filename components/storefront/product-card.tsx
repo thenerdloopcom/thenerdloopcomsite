@@ -70,7 +70,7 @@ export function ProductCard({
         </div>
       </Link>
 
-      <div className="card-info">
+      <Link href={`/products/${product.slug}`} className="card-info">
         <div>
           <p className="eyebrow">
             {product.category}
@@ -89,7 +89,7 @@ export function ProductCard({
         <strong>
           {formatPrice(product.price)}
         </strong>
-      </div>
+      </Link>
 
       <button
         type="button"

@@ -32,6 +32,9 @@ export function Storefront({
   const [activeCategory, setActiveCategory] = useState('All')
   const [activeSubcategory, setActiveSubcategory] =
     useState('All')
+  
+  const FEATURED_PAGE_SIZE = 4
+  const [featuredPage, setFeaturedPage] = useState(1)
 
   const currentCategory = categories.find(
     (category) => category.name === activeCategory,
@@ -55,9 +58,21 @@ export function Storefront({
     })
   }, [activeCategory, activeSubcategory])
 
+  const featuredTotalPages = Math.max(
+    1,
+    Math.ceil(filteredProducts.length / FEATURED_PAGE_SIZE),
+  )
+
+  const featuredPageProducts = filteredProducts.slice(
+    (featuredPage - 1) * FEATURED_PAGE_SIZE,
+    featuredPage * FEATURED_PAGE_SIZE,
+  )
+
+  
   const selectCategory = (category: string) => {
     setActiveCategory(category)
     setActiveSubcategory('All')
+    setFeaturedPage(1)
   }
 
   return (
@@ -273,8 +288,7 @@ export function Storefront({
 
           {/* Products */}
           <div className="product-grid">
-            {filteredProducts.map(
-              (product) => (
+            {featuredPageProducts.map((product) => (
                 <ProductCard
                   key={product.id}
                   product={product}
@@ -292,23 +306,35 @@ export function Storefront({
           {/* Homepage pagination indicator.
               Full pagination lives on /shop. */}
           <div className="mt-16 flex justify-center items-center gap-4">
-            <Link
-              href="/shop"
-              className="p-2 border-2 border-black"
+            <button
+              type="button"
+              className="p-2 border-2 border-black disabled:opacity-30 disabled:cursor-not-allowed"
+              disabled={featuredPage === 1}
+              onClick={() =>
+                setFeaturedPage((page) => Math.max(1, page - 1))
+              }
+              aria-label="Previous featured products"
             >
               <ChevronLeft />
-            </Link>
+            </button>
 
             <span className="font-mono font-bold">
-              FEATURED / {filteredProducts.length}
+              {featuredPage} / {featuredTotalPages}
             </span>
 
-            <Link
-              href="/shop"
-              className="p-2 border-2 border-black"
+            <button
+              type="button"
+              className="p-2 border-2 border-black disabled:opacity-30 disabled:cursor-not-allowed"
+              disabled={featuredPage === featuredTotalPages}
+              onClick={() =>
+                setFeaturedPage((page) =>
+                  Math.min(featuredTotalPages, page + 1),
+                )
+              }
+              aria-label="Next featured products"
             >
               <ChevronRight />
-            </Link>
+            </button>
           </div>
         </section>
 

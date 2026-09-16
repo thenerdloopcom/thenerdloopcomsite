@@ -92,7 +92,7 @@ export function CardCustomizePage({
     <main className="route-page">
       <section className="card-customization-page">
         <Link
-          href="/access-cards"
+          href={`/products/${product.slug}`}
           className="text-link"
         >
           <ArrowLeft size={15} />

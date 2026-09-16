@@ -85,7 +85,7 @@ export function CardPersonalizePage({
     <main className="route-page">
       <section className="card-customization-page">
         <Link
-          href="/access-cards"
+          href={`/products/${product.slug}`}
           className="text-link"
         >
           <ArrowLeft size={15} />
@@ -136,23 +136,18 @@ export function CardPersonalizePage({
 
                 {!preview ? (
                   <label className="upload-dropzone">
-                    <ImagePlus size={28} />
+                    <ImagePlus size={24} strokeWidth={2} />
 
-                    <strong>
-                      UPLOAD PHOTO
-                    </strong>
+                    <strong>UPLOAD PHOTO</strong>
 
-                    <span>
-                      JPG / PNG / WEBP
-                    </span>
+                    <span>JPG / PNG / WEBP</span>
 
                     <input
                       type="file"
                       accept="image/jpeg,image/png,image/webp"
                       onChange={(event) =>
                         setFile(
-                          event.target.files?.[0] ??
-                            null,
+                          event.target.files?.[0] ?? null,
                         )
                       }
                     />

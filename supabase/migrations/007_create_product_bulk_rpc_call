@@ -1,0 +1,109 @@
+create or replace function public.create_products(
+  p_products jsonb
+)
+returns table (
+  id uuid,
+  slug text,
+  name text
+)
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  product jsonb;
+  image jsonb;
+  product_id uuid;
+begin
+
+  for product in
+    select value
+    from jsonb_array_elements(p_products)
+  loop
+
+    -- Create product
+    insert into products (
+      slug,
+      name,
+      subtitle,
+      description,
+      category_id,
+      product_type,
+      card_type,
+      price,
+      compare_at_price,
+      badge,
+      status,
+      featured,
+      inventory_count,
+      color,
+      details,
+      personalization
+    )
+    values (
+      product ->> 'slug',
+      product ->> 'name',
+      product ->> 'subtitle',
+      product ->> 'description',
+      (product ->> 'category_id')::uuid,
+      product ->> 'product_type',
+      product ->> 'card_type',
+      (product ->> 'price')::bigint,
+      (product ->> 'compare_at_price')::bigint,
+      product ->> 'badge',
+      coalesce(product ->> 'status', 'draft'),
+      coalesce((product ->> 'featured')::boolean, false),
+      (product ->> 'inventory_count')::integer,
+      product ->> 'color',
+      array(
+        select jsonb_array_elements_text(product -> 'details')
+      ),
+      product -> 'personalization'
+    )
+    returning products.id into product_id;
+
+
+    -- Create product images
+    for image in
+      select value
+      from jsonb_array_elements(
+        coalesce(product -> 'images', '[]'::jsonb)
+      )
+    loop
+
+      insert into product_images (
+        product_id,
+        url,
+        image_type,
+        sort_order,
+        alt_text
+      )
+      values (
+        product_id,
+        image ->> 'url',
+        coalesce(image ->> 'image_type', 'gallery'),
+        coalesce((image ->> 'sort_order')::integer, 0),
+        image ->> 'alt_text'
+      );
+
+    end loop;
+
+
+    -- Return created product
+    return query
+      select
+        p.id,
+        p.slug,
+        p.name
+      from products p
+      where p.id = product_id;
+
+  end loop;
+
+end;
+$$;
+
+revoke execute on function public.create_products(jsonb) from public;
+revoke execute on function public.create_products(jsonb) from anon;
+revoke execute on function public.create_products(jsonb) from authenticated;
+grant execute on function public.create_products(jsonb) to service_role;

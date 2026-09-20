@@ -63,11 +63,11 @@ export async function createOrder({
   return result as { order_id: string; order_number: string; total: number }
 }
 
-export async function attachRazorpayOrderId(orderId: string, razorpayOrderId: string) {
+export async function attachPayuTransactionId(orderId: string, payuTransactionId: string) {
   const supabase = createAdminClient()
   const { error } = await supabase
     .from('orders')
-    .update({ razorpay_order_id: razorpayOrderId })
+    .update({ payu_transaction_id: payuTransactionId })
     .eq('id', orderId)
 
   if (error) throw error
@@ -87,12 +87,12 @@ export async function getOrderById(orderId: string) {
 
 export async function markOrderPaid({
   orderId,
-  razorpayOrderId,
-  razorpayPaymentId,
+  payuTransactionId,
+  payuPaymentId,
 }: {
   orderId: string
-  razorpayOrderId: string
-  razorpayPaymentId: string
+  payuTransactionId: string
+  payuPaymentId: string
 }) {
   const supabase = createAdminClient()
   const { error } = await supabase
@@ -100,8 +100,8 @@ export async function markOrderPaid({
     .update({
       status: 'confirmed',
       payment_status: 'paid',
-      razorpay_order_id: razorpayOrderId,
-      razorpay_payment_id: razorpayPaymentId,
+      payu_transaction_id: payuTransactionId,
+      payu_payment_id: payuPaymentId,
     })
     .eq('id', orderId)
 

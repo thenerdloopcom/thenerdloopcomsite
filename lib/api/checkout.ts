@@ -1,11 +1,11 @@
 import 'server-only'
 import {
   createOrder,
-  attachRazorpayOrderId,
+  attachPayuTransactionId,
   type CheckoutItem,
   type ShippingAddressInput,
 } from '@/lib/ecommerce/orders'
-import { createRazorpayOrder } from '@/lib/providers/razorpay'
+import { createPayUOrder } from '@/lib/providers/payu'
 
 export interface CheckoutRequest {
   userId: string | null
@@ -42,17 +42,17 @@ export const processCheckout = async (request: CheckoutRequest) => {
     shippingFee,
   })
 
-  const razorpayOrder = await createRazorpayOrder(order.total, order.order_number)
+  const payuOrder = await createPayUOrder(order.total, order.order_number)
 
   // Store the mapping immediately so the webhook (which only knows the
-  // Razorpay order id) can find our order.
-  await attachRazorpayOrderId(order.order_id, razorpayOrder.id)
+  // PAYU transaction id) can find our order.
+  await attachPayuTransactionId(order.order_id, payuOrder.merchantTransactionId)
 
   return {
     orderId: order.order_id,
     orderNumber: order.order_number,
     total: order.total,
     currency: 'INR',
-    razorpay: razorpayOrder,
+    payu: payuOrder,
   }
 }

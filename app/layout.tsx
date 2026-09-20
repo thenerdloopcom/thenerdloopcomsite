@@ -47,7 +47,6 @@ export default function RootLayout({
 
         {process.env.NODE_ENV === 'production' && <Analytics />}
 
-        <script src="https://checkout.razorpay.com/v1/checkout.js" async />
       </body>
     </html>
   )

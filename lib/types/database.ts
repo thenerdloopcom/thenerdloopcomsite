@@ -130,8 +130,8 @@ export interface Database {
           discount: number
           total: number
           currency: string
-          razorpay_order_id: string | null
-          razorpay_payment_id: string | null
+          payu_transaction_id: string | null
+          payu_payment_id: string | null
           created_at: string
           updated_at: string
         }
